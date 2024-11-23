@@ -4,7 +4,12 @@ from tkcalendar import Calendar
 
 class Account(CTkFrame):
     def __init__(self, master):
-        super().__init__(master=master, width=963, height=480, bg_color="transparent")
+        super().__init__(master=master, width=865, height=674, fg_color="transparent")
+
+        account_title_label = CTkLabel(master=self,
+                                   text="ACCOUNT",
+                                   font=("Roboto", 40, "bold"))
+        account_title_label.place(x=26, y=88)
 
         # Username Settings
         self.date_window = None
@@ -14,7 +19,7 @@ class Account(CTkFrame):
                                   width=64,
                                   text="Username",
                                   font=("Roboto", 14))
-        username_label.place(x=219, y=39)
+        username_label.place(x=170, y=172)
 
         self.username = CTkEntry(master=self,
                                  height=55,
@@ -23,7 +28,7 @@ class Account(CTkFrame):
                                  border_color=config.secondary,
                                  placeholder_text_color=config.text,
                                  font=("Roboto", 18))
-        self.username.place(x=198, y=64)
+        self.username.place(x=149, y=197)
 
         # Password Settings
         password_label = CTkLabel(master=self,
@@ -31,7 +36,7 @@ class Account(CTkFrame):
                                   width=69,
                                   text="Password",
                                   font=("Roboto", 14))
-        password_label.place(x=516, y=39)
+        password_label.place(x=467, y=172)
 
         self.password = CTkEntry(master=self,
                                  height=55,
@@ -41,7 +46,7 @@ class Account(CTkFrame):
                                  placeholder_text_color=config.text,
                                  show="*",
                                  font=("Roboto", 18))
-        self.password.place(x=492, y=63)
+        self.password.place(x=443, y=196)
 
         self.show_password_status = BooleanVar(value=False)
 
@@ -59,7 +64,7 @@ class Account(CTkFrame):
                                          onvalue=True,
                                          variable=self.show_password_status,
                                          command=self.show_password)
-        self.show_password.place(x=528, y=125)
+        self.show_password.place(x=480, y=259)
 
         # Contact Number
         contact_number_label = CTkLabel(master=self,
@@ -67,7 +72,7 @@ class Account(CTkFrame):
                                         width=114,
                                         text="Contact Number",
                                         font=("Roboto", 14))
-        contact_number_label.place(x=219, y=154)
+        contact_number_label.place(x=170, y=287)
 
         self.contact_number = CTkEntry(master=self,
                                        height=55,
@@ -76,7 +81,7 @@ class Account(CTkFrame):
                                        border_color=config.secondary,
                                        placeholder_text_color=config.text,
                                        font=("Roboto", 18))
-        self.contact_number.place(x=198, y=179)
+        self.contact_number.place(x=149, y=312)
 
         # Email Address
         email_address_label = CTkLabel(master=self,
@@ -84,7 +89,7 @@ class Account(CTkFrame):
                                        width=99,
                                        text="Email Address",
                                        font=("Roboto", 14))
-        email_address_label.place(x=516, y=154)
+        email_address_label.place(x=467, y=287)
 
         self.email_address = CTkEntry(master=self,
                                       height=55,
@@ -93,7 +98,7 @@ class Account(CTkFrame):
                                       border_color=config.secondary,
                                       placeholder_text_color=config.text,
                                       font=("Roboto", 18))
-        self.email_address.place(x=492, y=179)
+        self.email_address.place(x=443, y=312)
 
         # Birthday
         birthday_label = CTkLabel(master=self,
@@ -101,7 +106,7 @@ class Account(CTkFrame):
                                   width=52,
                                   text="Birthday",
                                   font=("Roboto", 14))
-        birthday_label.place(x=219, y=271)
+        birthday_label.place(x=170, y=404)
 
         choose_date = CTkButton(master=self,
                                 height=14,
@@ -112,7 +117,7 @@ class Account(CTkFrame):
                                 text="Choose Date",
                                 font=("Roboto", 14),
                                 command=self.choose_date)
-        choose_date.place(x=368, y=269)
+        choose_date.place(x=323, y=404)
 
         self.birthday = CTkEntry(master=self,
                                  height=55,
@@ -122,7 +127,7 @@ class Account(CTkFrame):
                                  placeholder_text_color=config.text,
                                  placeholder_text="mm/dd/yy",
                                  font=("Roboto", 18))
-        self.birthday.place(x=198, y=296)
+        self.birthday.place(x=149, y=429)
 
         # Gender
         gender_label = CTkLabel(master=self,
@@ -130,7 +135,7 @@ class Account(CTkFrame):
                                 width=50,
                                 text="Gender",
                                 font=("Roboto", 14))
-        gender_label.place(x=516, y=271)
+        gender_label.place(x=467, y=404)
 
         self.gender = CTkComboBox(master=self,
                                   height=55,
@@ -141,7 +146,7 @@ class Account(CTkFrame):
                                   button_hover_color=config.secondary,
                                   font=("Roboto", 18),
                                   values=["Male", "Female", "Others"])
-        self.gender.place(x=492, y=296)
+        self.gender.place(x=443, y=429)
 
         # Save Button
         self.save_button = CTkButton(master=self,
@@ -154,7 +159,7 @@ class Account(CTkFrame):
                                         hover_color=config.clicked_secondary,
                                         font=("Roboto", 18),
                                         command=self.save_func)
-        self.save_button.place(x=394, y=390)
+        self.save_button.place(x=345, y=523)
 
     def show_password(self):
         if self.show_password_status.get():

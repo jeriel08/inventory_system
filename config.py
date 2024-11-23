@@ -22,6 +22,7 @@ clicked_secondary = "#3C9C8E"
 background = "#F5F7FA"
 text = "#333333"
 exit_color = "#B23B3B"
+exit_color_hover = "#D9534F"
 
 # Username Icon
 username_logo = Image.open("images/username icon.png")

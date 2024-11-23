@@ -20,12 +20,7 @@ class Dashboard(CTkToplevel):
         # Posting Logo
         ctk_logo = CTkImage(light_image=config.app_logo, dark_image=config.app_logo, size=(255, 128))
         label = CTkLabel(master=self, image=ctk_logo, text="")
-        label.place(x=60, y=37)
-
-        self.title_label = CTkLabel(master=self,
-                               text="",
-                               font=("Roboto", 40, "bold"))
-        self.title_label.place(x=355, y=70)
+        label.place(x=80, y=75)
 
         # Inventory Button
         inventory_ctk = CTkImage(light_image=config.inventory_icon, dark_image=config.inventory_icon, size=(30, 30))
@@ -39,7 +34,7 @@ class Dashboard(CTkToplevel):
                            hover_color=config.secondary,
                            corner_radius=35,
                            command=self.show_inventory)
-        inventory.place(x=63, y=222)
+        inventory.place(x=124, y=240)
 
         # Timeline Button
         timeline_ctk = CTkImage(light_image=config.timeline_icon, dark_image=config.timeline_icon, size=(30, 30))
@@ -53,7 +48,7 @@ class Dashboard(CTkToplevel):
                            hover_color=config.secondary,
                            corner_radius=35,
                            command=self.show_timeline)
-        timeline.place(x=63, y=297)
+        timeline.place(x=124, y=317)
 
         # Hub Button
         hub_ctk = CTkImage(light_image=config.hub_icon, dark_image=config.hub_icon, size=(30, 30))
@@ -67,7 +62,7 @@ class Dashboard(CTkToplevel):
                            hover_color=config.secondary,
                            corner_radius=35,
                            command=self.show_hub)
-        hub.place(x=63, y=372)
+        hub.place(x=124, y=394)
 
         # Account Button
         account_ctk = CTkImage(light_image=config.account_icon, dark_image=config.account_icon, size=(30, 30))
@@ -81,7 +76,7 @@ class Dashboard(CTkToplevel):
                            hover_color=config.secondary,
                            corner_radius=35,
                            command=self.show_account)
-        account.place(x=63, y=447)
+        account.place(x=124, y=472)
 
         # Logout Button
         logout_ctk = CTkImage(light_image=config.logout_icon, dark_image=config.logout_icon, size=(30, 30))
@@ -95,44 +90,40 @@ class Dashboard(CTkToplevel):
                            hover_color=config.secondary,
                            corner_radius=35,
                            command=self.logout_button)
-        logout.place(x=63, y=522)
+        logout.place(x=124, y=549)
 
         self.withdraw()
 
         # Separator
         separator_line = CTkFrame(master=self,
-                                  height=391,
+                                  height=388,
                                   width=1,
                                   bg_color=config.secondary)
-        separator_line.place(x=237, y=200)
+        separator_line.place(x=315, y=215)
 
     def show_inventory(self):
-        self.title_label.configure(text="INVENTORY")
         self.hide_all_frames()
         if 'inventory_panel' not in self.frames:
             inventory_panel = inventory_frame.InventoryFrame(self)
             self.frames['inventory_panel'] = inventory_panel
-        self.frames['inventory_panel'].place(x=257,y=169)
+        self.frames['inventory_panel'].place(x=355,y=23)
 
     def show_timeline(self):
-        self.title_label.configure(text="TIMELINE")
         self.hide_all_frames()
 
     def show_hub(self):
-        self.title_label.configure(text="HUB")
         self.hide_all_frames()
         if 'hub_panel' not in self.frames:
             hub_panel = hub_frame.OuterFrame(self)
             self.frames['hub_panel'] = hub_panel
-        self.frames['hub_panel'].place(x=257,y=169)
+        self.frames['hub_panel'].place(x=355,y=25)
 
     def show_account(self):
-        self.title_label.configure(text="ACCOUNT")
         self.hide_all_frames()  # Hide all frames first
         if 'account_panel' not in self.frames:
             account_panel = account_frame.Account(self)
             self.frames['account_panel'] = account_panel
-        self.frames['account_panel'].place(x=257, y=169)
+        self.frames['account_panel'].place(x=355, y=25)
 
     def hide_all_frames(self):
         for frame in self.frames.values():
