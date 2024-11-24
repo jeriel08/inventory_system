@@ -21,14 +21,14 @@ class OuterFrame(CTkFrame):
         # Add Button
         add_ctk = CTkImage(light_image=config.add_icon,
                                  dark_image=config.add_icon,
-                                 size=(22, 22))
+                                 size=(30, 30))
 
         add_btn = CTkButton(master=self,
                             width=175,
                             height=50,
                             text="ADD",
                             text_color=config.text,
-                            font=("Roboto", 18),
+                            font=("Roboto", 21),
                             border_color=config.secondary,
                             corner_radius=35,
                             fg_color="transparent",
@@ -40,52 +40,52 @@ class OuterFrame(CTkFrame):
         # Delete Button
         delete_ctk = CTkImage(light_image=config.delete_icon,
                            dark_image=config.delete_icon,
-                           size=(22, 22))
+                           size=(30, 30))
 
         delete_btn = CTkButton(master=self,
                             width=175,
                             height=50,
                             text="DELETE",
                             text_color=config.text,
-                            font=("Roboto", 18),
+                            font=("Roboto", 21),
                             border_color=config.secondary,
                             corner_radius=35,
                             fg_color="transparent",
                             hover_color=config.secondary,
                             image=delete_ctk,
                             command=self.show_delete)
-        delete_btn.place(x=3, y=321)
+        delete_btn.place(x=3, y=412)
 
         # Update Button
         update_ctk = CTkImage(light_image=config.update_icon,
                            dark_image=config.update_icon,
-                           size=(22, 22))
+                           size=(30, 30))
 
         update_btn = CTkButton(master=self,
                             width=175,
                             height=50,
                             text="UPDATE",
                             text_color=config.text,
-                            font=('Roboto', 18),
+                            font=('Roboto', 21),
                             border_color=config.secondary,
                             corner_radius=35,
                             fg_color="transparent",
                             hover_color=config.secondary,
                                image=update_ctk,
                                command=self.show_update)
-        update_btn.place(x=3, y=412)
+        update_btn.place(x=3, y=321)
 
         # Clear Button
         clear_ctk = CTkImage(light_image=config.clear_icon,
                            dark_image=config.clear_icon,
-                           size=(22, 22))
+                           size=(30, 30))
 
         clear_btn = CTkButton(master=self,
                                width=175,
                                height=50,
                                text="CLEAR",
                                text_color=config.text,
-                               font=('Roboto', 18),
+                               font=('Roboto', 21),
                                border_color=config.secondary,
                                corner_radius=35,
                                fg_color="transparent",
@@ -510,7 +510,7 @@ class DeleteFrame(CTkFrame):
                                  font=("Roboto", 18))
         contact_entry.place(x=24, y=513)
 
-        # Sign-up Button
+        # Delete Button
         self.delete_button = CTkButton(master=self,
                                     width=177,
                                     height=51,
@@ -719,9 +719,37 @@ class UpdateFrame(CTkFrame):
 
 class ClearFrame(CTkFrame):
     def __init__(self, master):
-        super().__init__(master=master, width=618, height=674, bg_color="transparent")
+        super().__init__(master=master, width=618, height=674, fg_color="transparent")
 
         title_label = CTkLabel(master=self,
-                               text="CLEAR",
+                               text="CLEAR INVENTORY",
+                               font=("Roboto", 40, "bold"))
+        title_label.place(x=133, y=144)
+
+        warning = CTkLabel(master=self,
+                               text="WARNING!",
+                               font=("Roboto", 20, "bold"),
+                           text_color="#D90303")
+        warning.place(x=260, y=212)
+
+        info_text = CTkLabel(master=self,
+                               text="THIS OPERATION WILL CLEAR \nTHE INVENTORY THAT THE SYSTEM \nCURRENTLY HAVE.",
                                font=("Roboto", 20, "bold"))
-        title_label.place(x=48, y=16)
+        info_text.place(x=142, y=256)
+
+        info_text1 = CTkLabel(master=self,
+                             text="DO YOU WISH TO CONTINUE?",
+                             font=("Roboto", 20, "bold"))
+        info_text1.place(x=174, y=390)
+
+        self.delete_button = CTkButton(master=self,
+                                       width=177,
+                                       height=51,
+                                       text="CLEAR",
+                                       corner_radius=35,
+                                       border_color=config.accent,
+                                       fg_color=config.exit_color,
+                                       text_color=config.background,
+                                       hover_color=config.exit_color_hover,
+                                       font=("Roboto", 18))
+        self.delete_button.place(x=220, y=479)
