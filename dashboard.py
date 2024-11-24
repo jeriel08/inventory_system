@@ -1,7 +1,7 @@
 from customtkinter import *
 import customtkinter
 import config
-import inventory_frame, account_frame, hub_frame
+import inventory_frame, account_frame, hub_frame, timeline_frame
 
 customtkinter.set_appearance_mode("light")
 
@@ -110,6 +110,10 @@ class Dashboard(CTkToplevel):
 
     def show_timeline(self):
         self.hide_all_frames()
+        if 'timeline_panel' not in self.frames:
+            timeline_panel = timeline_frame.TimelineFrame(self)
+            self.frames['timeline_panel'] = timeline_panel
+        self.frames['timeline_panel'].place(x=355,y=23)
 
     def show_hub(self):
         self.hide_all_frames()
