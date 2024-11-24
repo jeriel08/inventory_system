@@ -2,7 +2,8 @@ from customtkinter import *
 import customtkinter
 from tkcalendar import Calendar
 import config
-
+from database import insert_user, check_user
+from tkinter import messagebox
 
 customtkinter.set_appearance_mode("light")
 
@@ -237,12 +238,36 @@ class SignUpPage(CTkToplevel):
         self.date_window.destroy()
 
     def signup_func(self):
+        # Retrieve entered values
+        entered_username = self.username.get()
+        entered_password = self.password.get()
+        entered_contact_number = self.contact_number.get()
+        entered_email_address = self.email_address.get()
+        entered_birthday = self.birthday.get()
+        entered_gender = self.gender.get()
+
+        # Clear entry widgets after registration
         self.username.delete(0, END)
         self.password.delete(0, END)
         self.contact_number.delete(0, END)
         self.email_address.delete(0, END)
         self.birthday.delete(0, END)
         self.gender.set("Male")
+
+        if not entered_username or not entered_password or not entered_contact_number or not entered_email_address or not entered_birthday:
+            messagebox.showerror("Input Error", "All fields are required.")
+            return
+
+        user = check_user(entered_username)
+
+        if user:
+            messagebox.showerror("Signup Failed", "Username already exists.")
+            return
+
+        insert_user(entered_username, entered_password, entered_contact_number, entered_email_address, entered_birthday,
+                    entered_gender)
+
+        messagebox.showinfo("Signup Successful", "Account created successfully!")
 
     def go_to_login(self):
         self.controller.show_login_page()

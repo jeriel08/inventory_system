@@ -1,5 +1,7 @@
 from customtkinter import *
 import customtkinter
+from tkinter import messagebox
+from database import check_user
 import config
 
 customtkinter.set_appearance_mode("light")
@@ -109,17 +111,26 @@ class LoginPage(CTk):
             self.password.configure(show="*")
 
     def login_button(self):
+        entered_username = self.username.get()
+        entered_password = self.password.get()
+
         self.username.delete(0, END)
         self.password.delete(0, END)
         self.username.configure(placeholder_text="Username")
         self.password.configure(placeholder_text="Password")
-        self.controller.show_dashboard()
 
-        """
-        if self.username.get() == "" and self.password.get() == "":
-            print("Please Enter Username and Password.")
-        elif self.username.get() == "admin" and self.password.get() == "admin":
-            self.controller.show_dashboard()
+        if entered_username == "" or entered_password == "":
+            messagebox.showerror("Input Error", "Please enter both username and password.")
+            return
+
+        user = check_user(entered_username)
+
+        if user:
+            stored_password = user['password']
+
+            if entered_password == stored_password:
+                self.controller.show_dashboard()
+            else:
+                messagebox.showerror("Login Failed", "Incorrect password.")
         else:
-            print("Wrong Username and Password")
-        """
+            messagebox.showerror("Login Failed", "User not found.")

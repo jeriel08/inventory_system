@@ -4,8 +4,7 @@ def connect_db():
     try:
         conn = mysql.connector.connect( host='localhost',
                                         user='root',
-                                        password='your_password',
-                                        database='your_database' )
+                                        database='inventory_system' )
         return conn
     except mysql.connector.Error as err:
         print(f"Error: {err}")
@@ -24,13 +23,23 @@ def fetch_users():
     close_connection(connection)
     return users
 
-def add_user(user_data):
+
+def insert_user(username, password, contact_number, email_address, birthday, gender):
     connection = connect_db()
     cursor = connection.cursor()
-    query = "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)"
-    cursor.execute(query, user_data)  # user_data is a tuple like (username, password, email)
+
+    # SQL query to insert a new user into the users table
+    query = """
+    INSERT INTO users (username, password, contact_number, email, birthdate, gender, created_at)
+    VALUES (%s, %s, %s, %s, %s, %s, NOW())
+    """
+
+    # Execute the query with the user's data
+    cursor.execute(query, (username, password, contact_number, email_address, birthday, gender))
     connection.commit()
+
     close_connection(connection)
+
 
 def update_user(user_id, updated_data):
     connection = connect_db()
@@ -47,13 +56,24 @@ def delete_user(user_id):
     connection.commit()
     close_connection(connection)
 
+
 def check_user(username):
+    # Establish database connection
     connection = connect_db()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    cursor = connection.cursor(dictionary=True)  # Use dictionary cursor for key-based access
+
+    # SQL query to find user by username
+    query = "SELECT * FROM users WHERE username = %s"
+    cursor.execute(query, (username,))
+
+    # Fetch the user data (returns a dictionary or None)
     user = cursor.fetchone()
-    close_connection(connection)
-    return user
+
+    # Close the connection
+    cursor.close()
+    connection.close()
+
+    return user  # This will be None if the user does not exist
 
 # Product Functions
 def fetch_products():
