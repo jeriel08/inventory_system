@@ -41,13 +41,25 @@ def insert_user(username, password, contact_number, email_address, birthday, gen
     close_connection(connection)
 
 
-def update_user(user_id, updated_data):
-    connection = connect_db()
-    cursor = connection.cursor()
-    query = "UPDATE users SET username = %s, password = %s, email = %s WHERE user_id = %s"
-    cursor.execute(query, (*updated_data, user_id))  # updated_data is a tuple (username, password, email)
-    connection.commit()
-    close_connection(connection)
+def update_user(user_id, username, password, contact_number, email, birthdate, gender):
+    try:
+        connection = connect_db()
+        cursor = connection.cursor()
+        query = """
+            UPDATE users
+            SET username = %s, password = %s, contact_number = %s, email = %s, birthdate = %s, gender = %s
+            WHERE user_id = %s
+        """
+        cursor.execute(query, (username, password, contact_number, email, birthdate, gender, user_id))
+        connection.commit()
+
+        close_connection(connection)
+
+        return True
+    except Exception as e:
+        print(f"Error updating user: {e}")
+        return False
+
 
 def delete_user(user_id):
     connection = connect_db()

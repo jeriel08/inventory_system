@@ -3,6 +3,7 @@ import customtkinter
 from tkinter import messagebox
 from database import check_user
 import config
+from session import ActiveUser
 
 customtkinter.set_appearance_mode("light")
 
@@ -129,6 +130,13 @@ class LoginPage(CTk):
             stored_password = user['password']
 
             if entered_password == stored_password:
+                ActiveUser.set_user(user['user_id'],
+                                    user['username'],
+                                    user['password'],
+                                    user['contact_number'],
+                                    user['email'],
+                                    user['birthdate'],
+                                    user['gender'])
                 self.controller.show_dashboard()
             else:
                 messagebox.showerror("Login Failed", "Incorrect password.")
