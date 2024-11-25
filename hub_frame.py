@@ -1,6 +1,10 @@
+from tkinter import messagebox
+
 from customtkinter import *
 from datetime import datetime
 import config
+import database
+from session import ActiveUser
 
 
 class OuterFrame(CTkFrame):
@@ -144,24 +148,7 @@ class AddFrame(CTkFrame):
         product_title_label = CTkLabel(master=self,
                                text="PRODUCT DETAILS",
                                font=("Roboto", 20, "bold"))
-        product_title_label.place(x=43, y=16)
-
-        # Product ID
-        product_id_label = CTkLabel(master=self,
-                                    width=72,
-                                    height=16,
-                                    text="Product ID:",
-                                    font=("Roboto", 14))
-        product_id_label.place(x=43, y=59)
-
-        product_id_entry = CTkEntry(master=self,
-                                    width=274,
-                                    height=51,
-                                    corner_radius=35,
-                                    border_color=config.secondary,
-                                    text_color=config.text,
-                                    font=("Roboto", 18))
-        product_id_entry.place(x=24, y=80)
+        product_title_label.place(x=43, y=97)
 
         # Product Name
         product_name_label = CTkLabel(master=self,
@@ -169,16 +156,16 @@ class AddFrame(CTkFrame):
                                     height=16,
                                     text="Product Name:",
                                     font=("Roboto", 14))
-        product_name_label.place(x=338, y=59)
+        product_name_label.place(x=43, y=130)
 
-        product_name_entry = CTkEntry(master=self,
+        self.product_name_entry = CTkEntry(master=self,
                                     width=274,
                                     height=51,
                                     corner_radius=35,
                                     border_color=config.secondary,
                                     text_color=config.text,
                                     font=("Roboto", 18))
-        product_name_entry.place(x=319, y=80)
+        self.product_name_entry.place(x=24, y=161)
 
         # Price
         price_label = CTkLabel(master=self,
@@ -186,16 +173,16 @@ class AddFrame(CTkFrame):
                                       height=16,
                                       text="Price:",
                                       font=("Roboto", 14))
-        price_label.place(x=43, y=151)
+        price_label.place(x=43, y=232)
 
-        price_entry = CTkEntry(master=self,
+        self.price_entry = CTkEntry(master=self,
                                       width=274,
                                       height=51,
                                       corner_radius=35,
                                       border_color=config.secondary,
                                       text_color=config.text,
                                       font=("Roboto", 18))
-        price_entry.place(x=24, y=172)
+        self.price_entry.place(x=24, y=253)
 
         # Quantity
         quantity_label = CTkLabel(master=self,
@@ -203,16 +190,16 @@ class AddFrame(CTkFrame):
                                height=16,
                                text="Quantity:",
                                font=("Roboto", 14))
-        quantity_label.place(x=338, y=151)
+        quantity_label.place(x=338, y=232)
 
-        quantity_entry = CTkEntry(master=self,
+        self.quantity_entry = CTkEntry(master=self,
                                width=274,
                                height=51,
                                corner_radius=35,
                                border_color=config.secondary,
                                text_color=config.text,
                                font=("Roboto", 18))
-        quantity_entry.place(x=319, y=172)
+        self.quantity_entry.place(x=319, y=253)
 
         # Category
         category_label = CTkLabel(master=self,
@@ -220,12 +207,12 @@ class AddFrame(CTkFrame):
                                   height=16,
                                   text="Category:",
                                   font=("Roboto", 14))
-        category_label.place(x=43, y=243)
+        category_label.place(x=338, y=140)
 
         categories = ["Electronics", "Apparel", "Home Appliances", "Furniture", "Groceries", "Health & Beauty", "Books",
                       "Toy & Games", "Sports Equipment", "Office Supplies", "Pet Supplies"]
 
-        category_entry = CTkComboBox(master=self,
+        self.category_entry = CTkComboBox(master=self,
                                   width=274,
                                   height=51,
                                   corner_radius=35,
@@ -235,52 +222,13 @@ class AddFrame(CTkFrame):
                                   text_color=config.text,
                                   values=categories,
                                   font=("Roboto", 18))
-        category_entry.place(x=24, y=264)
-
-        # Date
-        date_label = CTkLabel(master=self,
-                                  width=34,
-                                  height=16,
-                                  text="Date:",
-                                  font=("Roboto", 14))
-        date_label.place(x=338, y=243)
-
-        current_date = datetime.now().date()
-        formatted_date = current_date.strftime("%d/%m/%Y")
-
-        date_entry = CTkEntry(master=self,
-                                  width=274,
-                                  height=51,
-                                  corner_radius=35,
-                                  border_color=config.secondary,
-                                  text_color=config.text,
-                                  placeholder_text="dd/mm/yy",
-                                  font=("Roboto", 18))
-        date_entry.place(x=319, y=264)
-        date_entry.insert(0, formatted_date)
+        self.category_entry.place(x=319, y=161)
 
         # Supplier Section
         supplier_title_label = CTkLabel(master=self,
                                        text="SUPPLIER DETAILS",
                                        font=("Roboto", 20, "bold"))
-        supplier_title_label.place(x=43, y=357)
-
-        # Supplier ID
-        supplier_id_label = CTkLabel(master=self,
-                                    width=72,
-                                    height=16,
-                                    text="Supplier ID:",
-                                    font=("Roboto", 14))
-        supplier_id_label.place(x=43, y=400)
-
-        supplier_id_entry = CTkEntry(master=self,
-                                    width=274,
-                                    height=51,
-                                    corner_radius=35,
-                                    border_color=config.secondary,
-                                    text_color=config.text,
-                                    font=("Roboto", 18))
-        supplier_id_entry.place(x=24, y=421)
+        supplier_title_label.place(x=43, y=346)
 
         # Supplier Name
         supplier_name_label = CTkLabel(master=self,
@@ -288,16 +236,16 @@ class AddFrame(CTkFrame):
                                       height=16,
                                       text="Supplier Name:",
                                       font=("Roboto", 14))
-        supplier_name_label.place(x=338, y=400)
+        supplier_name_label.place(x=43, y=389)
 
-        supplier_name_entry = CTkEntry(master=self,
+        self.supplier_name_entry = CTkEntry(master=self,
                                       width=274,
                                       height=51,
                                       corner_radius=35,
                                       border_color=config.secondary,
                                       text_color=config.text,
                                       font=("Roboto", 18))
-        supplier_name_entry.place(x=319, y=421)
+        self.supplier_name_entry.place(x=24, y=410)
 
         # Contact Number
         contact_label = CTkLabel(master=self,
@@ -305,16 +253,16 @@ class AddFrame(CTkFrame):
                                height=16,
                                text="Contact Number:",
                                font=("Roboto", 14))
-        contact_label.place(x=43, y=492)
+        contact_label.place(x=338, y=389)
 
-        contact_entry = CTkEntry(master=self,
+        self.contact_entry = CTkEntry(master=self,
                                width=274,
                                height=51,
                                corner_radius=35,
                                border_color=config.secondary,
                                text_color=config.text,
                                font=("Roboto", 18))
-        contact_entry.place(x=24, y=513)
+        self.contact_entry.place(x=319, y=410)
 
         # Sign-up Button
         self.add_button = CTkButton(master=self,
@@ -325,8 +273,64 @@ class AddFrame(CTkFrame):
                                         border_color=config.accent,
                                         fg_color=config.secondary,
                                         hover_color=config.clicked_secondary,
-                                        font=("Roboto", 18))
-        self.add_button.place(x=220, y=606)
+                                        font=("Roboto", 18),
+                                    command=self.add_product)
+        self.add_button.place(x=220, y=525)
+
+    def add_product(self):
+        product_name = self.product_name_entry.get().strip()
+        quantity = self.quantity_entry.get().strip()
+        price = self.price_entry.get().strip()
+        category = self.category_entry.get().strip()
+        supplier_name = self.supplier_name_entry.get().strip()
+        supplier_contact = self.contact_entry.get().strip()
+
+        price_float = float(price)
+
+        if not all([product_name, quantity, price, category, supplier_name, supplier_contact]):
+            messagebox.showerror("Input Error", "All fields must be filled.")
+            return
+
+        if not quantity.isdigit() or int(quantity) <= 0:
+            messagebox.showerror("Input Error", "Quantity must be a positive integer.")
+            return
+
+        if not price.isdigit():
+            messagebox.showerror("Input Error", "Price must be a positive integer.")
+            return
+
+        if not (0 <= price_float <= 99999999.99):
+            messagebox.showerror("Input Error", "Price must be between 0 and 99,999,999.99.")
+            return
+
+        if not supplier_contact.isdigit() or len(supplier_contact) > 11:
+            messagebox.showerror("Input Error", "Supplier contact must contain numbers only.")
+            return
+
+        existing_product = database.get_product_by_name(product_name)
+
+        if existing_product:
+            messagebox.showerror("Product Already Exist", "Product is already recorded. Update it instead.")
+            return
+
+        existing_supplier = database.get_supplier_by_name_and_contact(supplier_name, supplier_contact)
+
+        if existing_supplier:
+            supplier_id = existing_supplier['supplier_id']
+        else:
+            supplier_id = database.add_supplier(supplier_name, supplier_contact)
+            if not supplier_id:
+                messagebox.showerror("Error", "Failed to add supplier. Product not saved.")
+                return
+
+        if supplier_id:
+            user_id = ActiveUser.user_id
+
+            database.add_product(product_name=product_name, category=category, price=int(price), quantity=int(quantity), supplier_id=supplier_id, user_id=user_id)
+            messagebox.showinfo("Success", "Product added successfully.")
+        else:
+            messagebox.showerror("Error", "Failed to add supplier. Product not saved.")
+
 
 class DeleteFrame(CTkFrame):
     def __init__(self, master):

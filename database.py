@@ -104,11 +104,11 @@ def fetch_product_by_id(product_id):
     close_connection(connection)
     return product
 
-def add_product(product_data):
+def add_product(product_name, price, quantity, category, supplier_id, user_id):
     connection = connect_db()
     cursor = connection.cursor()
-    query = "INSERT INTO products (product_name, description, price, quantity, supplier_id, user_id) VALUES (%s, %s, %s, %s, %s, %s)"
-    cursor.execute(query, product_data)  # product_data is a tuple like (product_name, description, price, quantity, supplier_id, user_id)
+    query = "INSERT INTO products (product_name, price, quantity, category, supplier_id, user_id, created_at) VALUES (%s, %s, %s, %s, %s, %s, NOW())"
+    cursor.execute(query, (product_name, int(quantity), float(price), category, supplier_id, user_id))
     connection.commit()
     close_connection(connection)
 
@@ -127,13 +127,15 @@ def delete_product(product_id):
     connection.commit()
     close_connection(connection)
 
-def check_product_exists(product_name):
+def get_product_by_name(product_name):
     connection = connect_db()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM products WHERE product_name = %s", (product_name,))
-    product = cursor.fetchone()
+    cursor = connection.cursor(dictionary=True)
+    query = "SELECT * FROM products WHERE product_name = %s"
+    cursor.execute(query, (product_name,))
+    result = cursor.fetchone()
     close_connection(connection)
-    return product
+    return result
+
 
 # Supplier Functions
 def fetch_suppliers():
@@ -144,13 +146,15 @@ def fetch_suppliers():
     close_connection(connection)
     return suppliers
 
-def add_supplier(supplier_data):
+def add_supplier(supplier_name, supplier_contact):
     connection = connect_db()
     cursor = connection.cursor()
-    query = "INSERT INTO suppliers (supplier_name, contact_info) VALUES (%s, %s)"
-    cursor.execute(query, supplier_data)  # supplier_data is a tuple like (supplier_name, contact_info)
+    query = "INSERT INTO suppliers (supplier_name, contact_number) VALUES (%s, %s)"
+    cursor.execute(query, (supplier_name, supplier_contact))  # supplier_data is a tuple like (supplier_name, contact_info)
     connection.commit()
+    supplier_id = cursor.lastrowid
     close_connection(connection)
+    return supplier_id
 
 def update_supplier(supplier_id, updated_data):
     connection = connect_db()
@@ -167,13 +171,15 @@ def delete_supplier(supplier_id):
     connection.commit()
     close_connection(connection)
 
-def fetch_supplier_by_id(supplier_id):
+def get_supplier_by_name_and_contact(supplier_name, contact_info):
     connection = connect_db()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM suppliers WHERE supplier_id = %s", (supplier_id,))
-    supplier = cursor.fetchone()
+    query = "SELECT * FROM suppliers WHERE supplier_name = %s AND contact_info = %s"
+    cursor.execute(query, (supplier_name, contact_info))
+    result = cursor.fetchone()
     close_connection(connection)
-    return supplier
+    return result
+
 
 # General Utility
 def fetch_treeview_data():
