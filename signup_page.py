@@ -1,9 +1,11 @@
+from datetime import datetime
 from customtkinter import *
 import customtkinter
 from tkcalendar import Calendar
 import config
 from database import insert_user, check_user
 from tkinter import messagebox
+import re
 
 customtkinter.set_appearance_mode("light")
 
@@ -229,13 +231,18 @@ class SignUpPage(CTkToplevel):
         submit.place(x=152, y=288)
 
     def grab_date(self):
-        # Get the selected date and update the birthday entry
         selected_date = self.cal.get_date()
-        self.birthday.delete(0, END)
-        self.birthday.insert(0, selected_date)
 
-        # Close the calendar window
-        self.date_window.destroy()
+        try:
+            formatted_date = datetime.strptime(selected_date, "%m/%d/%y").strftime("%Y-%m-%d")
+
+            self.birthday.delete(0, END)
+            self.birthday.insert(0, formatted_date)
+
+            self.date_window.destroy()
+
+        except ValueError:
+            messagebox.showerror("Date Error", "An error occurred while processing the selected date.")
 
     def signup_func(self):
         # Retrieve entered values
@@ -254,9 +261,26 @@ class SignUpPage(CTkToplevel):
         self.birthday.delete(0, END)
         self.gender.set("Male")
 
-        if not entered_username or not entered_password or not entered_contact_number or not entered_email_address or not entered_birthday:
+        if not all(
+                [entered_username, entered_password, entered_contact_number, entered_email_address, entered_birthday]):
             messagebox.showerror("Input Error", "All fields are required.")
-            return
+            return False
+
+        if len(entered_password) < 8:
+            messagebox.showerror("Password Length", "Password must be at least 8 characters long.")
+            return False
+
+        if not entered_contact_number.isdigit() or len(entered_contact_number) != 11:
+            messagebox.showerror("Invalid Contact Number", "Contact Number must be exactly 11 digits long.")
+            return False
+        elif  not entered_contact_number.startswith("09"):
+            messagebox.showerror("Invalid Contact Number", "Invalid Contact Number. Should start with 09.")
+            return False
+        
+        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        if not re.match(email_regex, entered_email_address):
+            messagebox.showerror("Invalid Email Address", "Please enter a valid email address.")
+            return False
 
         user = check_user(entered_username)
 
