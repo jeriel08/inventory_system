@@ -1,7 +1,6 @@
 from tkinter import messagebox
 
 from customtkinter import *
-from datetime import datetime
 import config
 import database
 from session import ActiveUser
@@ -331,35 +330,23 @@ class AddFrame(CTkFrame):
         else:
             messagebox.showerror("Error", "Failed to add supplier. Product not saved.")
 
-
 class DeleteFrame(CTkFrame):
     def __init__(self, master):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
+
+        # Initialize Variables
+        self.product_name_var = StringVar()
+        self.category_var = StringVar()
+        self.quantity_var = StringVar()
+        self.price_var = StringVar()
+        self.supplier_name_var = StringVar()
+        self.contact_number_var = StringVar()
 
         # Product Section
         product_title_label = CTkLabel(master=self,
                                        text="PRODUCT DETAILS",
                                        font=("Roboto", 20, "bold"))
-        product_title_label.place(x=43, y=16)
-
-        # Product ID
-        product_id_label = CTkLabel(master=self,
-                                    width=72,
-                                    height=16,
-                                    text="Product ID:",
-                                    font=("Roboto", 14))
-        product_id_label.place(x=43, y=59)
-
-        product_id_entry = CTkComboBox(master=self,
-                                     width=274,
-                                     height=51,
-                                     corner_radius=35,
-                                     border_color=config.secondary,
-                                     button_color=config.secondary,
-                                     button_hover_color=config.clicked_secondary,
-                                     text_color=config.text,
-                                     font=("Roboto", 18))
-        product_id_entry.place(x=24, y=80)
+        product_title_label.place(x=43, y=97)
 
         # Product Name
         product_name_label = CTkLabel(master=self,
@@ -367,16 +354,19 @@ class DeleteFrame(CTkFrame):
                                       height=16,
                                       text="Product Name:",
                                       font=("Roboto", 14))
-        product_name_label.place(x=338, y=59)
+        product_name_label.place(x=43, y=130)
 
-        product_name_entry = CTkEntry(master=self,
-                                      width=274,
-                                      height=51,
-                                      corner_radius=35,
-                                      border_color=config.secondary,
-                                      text_color=config.text,
-                                      font=("Roboto", 18))
-        product_name_entry.place(x=319, y=80)
+        self.product_name_combobox = CTkComboBox(master=self,
+                                           width=274,
+                                           height=51,
+                                           corner_radius=35,
+                                           border_color=config.secondary,
+                                           button_color=config.secondary,
+                                           button_hover_color=config.secondary,
+                                           variable=self.product_name_var,
+                                                 command=self.load_product_details,
+                                           font=("Roboto", 18))
+        self.product_name_combobox.place(x=24, y=161)
 
         # Price
         price_label = CTkLabel(master=self,
@@ -384,16 +374,17 @@ class DeleteFrame(CTkFrame):
                                height=16,
                                text="Price:",
                                font=("Roboto", 14))
-        price_label.place(x=43, y=151)
+        price_label.place(x=43, y=232)
 
-        price_entry = CTkEntry(master=self,
-                               width=274,
-                               height=51,
-                               corner_radius=35,
-                               border_color=config.secondary,
-                               text_color=config.text,
-                               font=("Roboto", 18))
-        price_entry.place(x=24, y=172)
+        self.price_entry = CTkEntry(master=self,
+                                    width=274,
+                                    height=51,
+                                    corner_radius=35,
+                                    border_color=config.secondary,
+                                    text_color=config.text,
+                                    textvariable=self.price_var,
+                                    font=("Roboto", 18))
+        self.price_entry.place(x=24, y=253)
 
         # Quantity
         quantity_label = CTkLabel(master=self,
@@ -401,16 +392,17 @@ class DeleteFrame(CTkFrame):
                                   height=16,
                                   text="Quantity:",
                                   font=("Roboto", 14))
-        quantity_label.place(x=338, y=151)
+        quantity_label.place(x=338, y=232)
 
-        quantity_entry = CTkEntry(master=self,
-                                  width=274,
-                                  height=51,
-                                  corner_radius=35,
-                                  border_color=config.secondary,
-                                  text_color=config.text,
-                                  font=("Roboto", 18))
-        quantity_entry.place(x=319, y=172)
+        self.quantity_entry = CTkEntry(master=self,
+                                       width=274,
+                                       height=51,
+                                       corner_radius=35,
+                                       border_color=config.secondary,
+                                       text_color=config.text,
+                                       textvariable=self.quantity_var,
+                                       font=("Roboto", 18))
+        self.quantity_entry.place(x=319, y=253)
 
         # Category
         category_label = CTkLabel(master=self,
@@ -418,67 +410,29 @@ class DeleteFrame(CTkFrame):
                                   height=16,
                                   text="Category:",
                                   font=("Roboto", 14))
-        category_label.place(x=43, y=243)
+        category_label.place(x=338, y=140)
 
         categories = ["Electronics", "Apparel", "Home Appliances", "Furniture", "Groceries", "Health & Beauty", "Books",
                       "Toy & Games", "Sports Equipment", "Office Supplies", "Pet Supplies"]
 
-        category_entry = CTkComboBox(master=self,
-                                     width=274,
-                                     height=51,
-                                     corner_radius=35,
-                                     border_color=config.secondary,
-                                     button_color=config.secondary,
-                                     button_hover_color=config.clicked_secondary,
-                                     text_color=config.text,
-                                     values=categories,
-                                     font=("Roboto", 18))
-        category_entry.place(x=24, y=264)
-
-        # Date
-        date_label = CTkLabel(master=self,
-                              width=34,
-                              height=16,
-                              text="Date:",
-                              font=("Roboto", 14))
-        date_label.place(x=338, y=243)
-
-        current_date = datetime.now().date()
-        formatted_date = current_date.strftime("%d/%m/%Y")
-
-        date_entry = CTkEntry(master=self,
-                              width=274,
-                              height=51,
-                              corner_radius=35,
-                              border_color=config.secondary,
-                              text_color=config.text,
-                              placeholder_text="dd/mm/yy",
-                              font=("Roboto", 18))
-        date_entry.place(x=319, y=264)
-        date_entry.insert(0, formatted_date)
+        self.category_entry = CTkComboBox(master=self,
+                                          width=274,
+                                          height=51,
+                                          corner_radius=35,
+                                          border_color=config.secondary,
+                                          button_color=config.secondary,
+                                          button_hover_color=config.clicked_secondary,
+                                          text_color=config.text,
+                                          variable=self.category_var,
+                                          values=categories,
+                                          font=("Roboto", 18))
+        self.category_entry.place(x=319, y=161)
 
         # Supplier Section
         supplier_title_label = CTkLabel(master=self,
                                         text="SUPPLIER DETAILS",
                                         font=("Roboto", 20, "bold"))
-        supplier_title_label.place(x=43, y=357)
-
-        # Supplier ID
-        supplier_id_label = CTkLabel(master=self,
-                                     width=72,
-                                     height=16,
-                                     text="Supplier ID:",
-                                     font=("Roboto", 14))
-        supplier_id_label.place(x=43, y=400)
-
-        supplier_id_entry = CTkEntry(master=self,
-                                     width=274,
-                                     height=51,
-                                     corner_radius=35,
-                                     border_color=config.secondary,
-                                     text_color=config.text,
-                                     font=("Roboto", 18))
-        supplier_id_entry.place(x=24, y=421)
+        supplier_title_label.place(x=43, y=346)
 
         # Supplier Name
         supplier_name_label = CTkLabel(master=self,
@@ -486,16 +440,17 @@ class DeleteFrame(CTkFrame):
                                        height=16,
                                        text="Supplier Name:",
                                        font=("Roboto", 14))
-        supplier_name_label.place(x=338, y=400)
+        supplier_name_label.place(x=43, y=389)
 
-        supplier_name_entry = CTkEntry(master=self,
-                                       width=274,
-                                       height=51,
-                                       corner_radius=35,
-                                       border_color=config.secondary,
-                                       text_color=config.text,
-                                       font=("Roboto", 18))
-        supplier_name_entry.place(x=319, y=421)
+        self.supplier_name_entry = CTkEntry(master=self,
+                                            width=274,
+                                            height=51,
+                                            corner_radius=35,
+                                            border_color=config.secondary,
+                                            text_color=config.text,
+                                            textvariable=self.supplier_name_var,
+                                            font=("Roboto", 18))
+        self.supplier_name_entry.place(x=24, y=410)
 
         # Contact Number
         contact_label = CTkLabel(master=self,
@@ -503,16 +458,17 @@ class DeleteFrame(CTkFrame):
                                  height=16,
                                  text="Contact Number:",
                                  font=("Roboto", 14))
-        contact_label.place(x=43, y=492)
+        contact_label.place(x=338, y=389)
 
-        contact_entry = CTkEntry(master=self,
-                                 width=274,
-                                 height=51,
-                                 corner_radius=35,
-                                 border_color=config.secondary,
-                                 text_color=config.text,
-                                 font=("Roboto", 18))
-        contact_entry.place(x=24, y=513)
+        self.contact_entry = CTkEntry(master=self,
+                                      width=274,
+                                      height=51,
+                                      corner_radius=35,
+                                      border_color=config.secondary,
+                                      text_color=config.text,
+                                      textvariable=self.contact_number_var,
+                                      font=("Roboto", 18))
+        self.contact_entry.place(x=319, y=410)
 
         # Delete Button
         self.delete_button = CTkButton(master=self,
@@ -524,8 +480,46 @@ class DeleteFrame(CTkFrame):
                                     fg_color=config.exit_color,
                                     text_color=config.background,
                                     hover_color=config.exit_color_hover,
+                                    command=self.delete_product,
                                     font=("Roboto", 18))
-        self.delete_button.place(x=220, y=606)
+        self.delete_button.place(x=220, y=525)
+
+        self.populate_product_combobox()
+
+    def populate_product_combobox(self):
+        products = database.fetch_product_name()
+        self.product_name_combobox.configure(values=products)
+
+    def load_product_details(self, product_name):
+        product_details = database.fetch_product_detail(product_name)
+        if product_details:
+            self.category_entry.set(product_details[0])
+            self.quantity_entry.insert(0, product_details[1])
+            self.price_entry.insert(0, product_details[2])
+            self.supplier_name_entry.insert(0, product_details[3])
+            self.contact_entry.insert(0, product_details[4])
+        else:
+            messagebox.showerror("Error", "Product details not found.")
+
+    def delete_product(self):
+        product_name = self.product_name_var.get()
+
+        if not product_name:
+            messagebox.showerror("Error", "Please select a product to delete.")
+            return
+
+        database.delete_product(product_name)
+        messagebox.showinfo("Success", f"Product '{product_name}' deleted successfully!")
+        self.populate_product_combobox()
+        self.clear_fields()
+
+    def clear_fields(self):
+        self.product_name_var.set("")
+        self.category_var.set("")
+        self.quantity_var.set("")
+        self.price_var.set("")
+        self.supplier_name_var.set("")
+        self.contact_number_var.set("")
 
 class UpdateFrame(CTkFrame):
     def __init__(self, master):
@@ -535,26 +529,7 @@ class UpdateFrame(CTkFrame):
         product_title_label = CTkLabel(master=self,
                                        text="PRODUCT DETAILS",
                                        font=("Roboto", 20, "bold"))
-        product_title_label.place(x=43, y=16)
-
-        # Product ID
-        product_id_label = CTkLabel(master=self,
-                                    width=72,
-                                    height=16,
-                                    text="Product ID:",
-                                    font=("Roboto", 14))
-        product_id_label.place(x=43, y=59)
-
-        product_id_entry = CTkComboBox(master=self,
-                                       width=274,
-                                       height=51,
-                                       corner_radius=35,
-                                       border_color=config.secondary,
-                                       button_color=config.secondary,
-                                       button_hover_color=config.clicked_secondary,
-                                       text_color=config.text,
-                                       font=("Roboto", 18))
-        product_id_entry.place(x=24, y=80)
+        product_title_label.place(x=43, y=97)
 
         # Product Name
         product_name_label = CTkLabel(master=self,
@@ -562,16 +537,17 @@ class UpdateFrame(CTkFrame):
                                       height=16,
                                       text="Product Name:",
                                       font=("Roboto", 14))
-        product_name_label.place(x=338, y=59)
+        product_name_label.place(x=43, y=130)
 
-        product_name_entry = CTkEntry(master=self,
-                                      width=274,
-                                      height=51,
-                                      corner_radius=35,
-                                      border_color=config.secondary,
-                                      text_color=config.text,
-                                      font=("Roboto", 18))
-        product_name_entry.place(x=319, y=80)
+        self.product_name_combobox = CTkComboBox(master=self,
+                                                 width=274,
+                                                 height=51,
+                                                 corner_radius=35,
+                                                 border_color=config.secondary,
+                                                 button_color=config.secondary,
+                                                 button_hover_color=config.secondary,
+                                                 font=("Roboto", 18))
+        self.product_name_combobox.place(x=24, y=161)
 
         # Price
         price_label = CTkLabel(master=self,
@@ -579,16 +555,16 @@ class UpdateFrame(CTkFrame):
                                height=16,
                                text="Price:",
                                font=("Roboto", 14))
-        price_label.place(x=43, y=151)
+        price_label.place(x=43, y=232)
 
-        price_entry = CTkEntry(master=self,
-                               width=274,
-                               height=51,
-                               corner_radius=35,
-                               border_color=config.secondary,
-                               text_color=config.text,
-                               font=("Roboto", 18))
-        price_entry.place(x=24, y=172)
+        self.price_entry = CTkEntry(master=self,
+                                    width=274,
+                                    height=51,
+                                    corner_radius=35,
+                                    border_color=config.secondary,
+                                    text_color=config.text,
+                                    font=("Roboto", 18))
+        self.price_entry.place(x=24, y=253)
 
         # Quantity
         quantity_label = CTkLabel(master=self,
@@ -596,16 +572,16 @@ class UpdateFrame(CTkFrame):
                                   height=16,
                                   text="Quantity:",
                                   font=("Roboto", 14))
-        quantity_label.place(x=338, y=151)
+        quantity_label.place(x=338, y=232)
 
-        quantity_entry = CTkEntry(master=self,
-                                  width=274,
-                                  height=51,
-                                  corner_radius=35,
-                                  border_color=config.secondary,
-                                  text_color=config.text,
-                                  font=("Roboto", 18))
-        quantity_entry.place(x=319, y=172)
+        self.quantity_entry = CTkEntry(master=self,
+                                       width=274,
+                                       height=51,
+                                       corner_radius=35,
+                                       border_color=config.secondary,
+                                       text_color=config.text,
+                                       font=("Roboto", 18))
+        self.quantity_entry.place(x=319, y=253)
 
         # Category
         category_label = CTkLabel(master=self,
@@ -613,67 +589,28 @@ class UpdateFrame(CTkFrame):
                                   height=16,
                                   text="Category:",
                                   font=("Roboto", 14))
-        category_label.place(x=43, y=243)
+        category_label.place(x=338, y=140)
 
         categories = ["Electronics", "Apparel", "Home Appliances", "Furniture", "Groceries", "Health & Beauty", "Books",
                       "Toy & Games", "Sports Equipment", "Office Supplies", "Pet Supplies"]
 
-        category_entry = CTkComboBox(master=self,
-                                     width=274,
-                                     height=51,
-                                     corner_radius=35,
-                                     border_color=config.secondary,
-                                     button_color=config.secondary,
-                                     button_hover_color=config.clicked_secondary,
-                                     text_color=config.text,
-                                     values=categories,
-                                     font=("Roboto", 18))
-        category_entry.place(x=24, y=264)
-
-        # Date
-        date_label = CTkLabel(master=self,
-                              width=34,
-                              height=16,
-                              text="Date:",
-                              font=("Roboto", 14))
-        date_label.place(x=338, y=243)
-
-        current_date = datetime.now().date()
-        formatted_date = current_date.strftime("%d/%m/%Y")
-
-        date_entry = CTkEntry(master=self,
-                              width=274,
-                              height=51,
-                              corner_radius=35,
-                              border_color=config.secondary,
-                              text_color=config.text,
-                              placeholder_text="dd/mm/yy",
-                              font=("Roboto", 18))
-        date_entry.place(x=319, y=264)
-        date_entry.insert(0, formatted_date)
+        self.category_entry = CTkComboBox(master=self,
+                                          width=274,
+                                          height=51,
+                                          corner_radius=35,
+                                          border_color=config.secondary,
+                                          button_color=config.secondary,
+                                          button_hover_color=config.clicked_secondary,
+                                          text_color=config.text,
+                                          values=categories,
+                                          font=("Roboto", 18))
+        self.category_entry.place(x=319, y=161)
 
         # Supplier Section
         supplier_title_label = CTkLabel(master=self,
                                         text="SUPPLIER DETAILS",
                                         font=("Roboto", 20, "bold"))
-        supplier_title_label.place(x=43, y=357)
-
-        # Supplier ID
-        supplier_id_label = CTkLabel(master=self,
-                                     width=72,
-                                     height=16,
-                                     text="Supplier ID:",
-                                     font=("Roboto", 14))
-        supplier_id_label.place(x=43, y=400)
-
-        supplier_id_entry = CTkEntry(master=self,
-                                     width=274,
-                                     height=51,
-                                     corner_radius=35,
-                                     border_color=config.secondary,
-                                     text_color=config.text,
-                                     font=("Roboto", 18))
-        supplier_id_entry.place(x=24, y=421)
+        supplier_title_label.place(x=43, y=346)
 
         # Supplier Name
         supplier_name_label = CTkLabel(master=self,
@@ -681,16 +618,16 @@ class UpdateFrame(CTkFrame):
                                        height=16,
                                        text="Supplier Name:",
                                        font=("Roboto", 14))
-        supplier_name_label.place(x=338, y=400)
+        supplier_name_label.place(x=43, y=389)
 
-        supplier_name_entry = CTkEntry(master=self,
-                                       width=274,
-                                       height=51,
-                                       corner_radius=35,
-                                       border_color=config.secondary,
-                                       text_color=config.text,
-                                       font=("Roboto", 18))
-        supplier_name_entry.place(x=319, y=421)
+        self.supplier_name_entry = CTkEntry(master=self,
+                                            width=274,
+                                            height=51,
+                                            corner_radius=35,
+                                            border_color=config.secondary,
+                                            text_color=config.text,
+                                            font=("Roboto", 18))
+        self.supplier_name_entry.place(x=24, y=410)
 
         # Contact Number
         contact_label = CTkLabel(master=self,
@@ -698,16 +635,16 @@ class UpdateFrame(CTkFrame):
                                  height=16,
                                  text="Contact Number:",
                                  font=("Roboto", 14))
-        contact_label.place(x=43, y=492)
+        contact_label.place(x=338, y=389)
 
-        contact_entry = CTkEntry(master=self,
-                                 width=274,
-                                 height=51,
-                                 corner_radius=35,
-                                 border_color=config.secondary,
-                                 text_color=config.text,
-                                 font=("Roboto", 18))
-        contact_entry.place(x=24, y=513)
+        self.contact_entry = CTkEntry(master=self,
+                                      width=274,
+                                      height=51,
+                                      corner_radius=35,
+                                      border_color=config.secondary,
+                                      text_color=config.text,
+                                      font=("Roboto", 18))
+        self.contact_entry.place(x=319, y=410)
 
         # Sign-up Button
         self.update_button = CTkButton(master=self,
@@ -719,7 +656,7 @@ class UpdateFrame(CTkFrame):
                                         fg_color=config.secondary,
                                         hover_color=config.clicked_secondary,
                                         font=("Roboto", 18))
-        self.update_button.place(x=220, y=606)
+        self.update_button.place(x=220, y=525)
 
 class ClearFrame(CTkFrame):
     def __init__(self, master):

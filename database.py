@@ -79,10 +79,10 @@ def update_product(product_id, updated_data):
     connection.commit()
     close_connection(connection)
 
-def delete_product(product_id):
+def delete_product(product_name):
     connection = connect_db()
     cursor = connection.cursor()
-    cursor.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
+    cursor.execute("DELETE FROM products WHERE product_name = %s", (product_name,))
     connection.commit()
     close_connection(connection)
 
@@ -95,6 +95,27 @@ def get_product_by_name(product_name):
     close_connection(connection)
     return result
 
+def fetch_product_name():
+    db = connect_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT product_name FROM Products")
+    products = cursor.fetchall()
+    db.close()
+    return [product[0] for product in products]
+
+def fetch_product_detail(product_name):
+    db = connect_db()
+    cursor = db.cursor()
+    query = """
+            SELECT p.category, p.quantity, p.price, s.supplier_name, s.contact_number
+            FROM Products p            
+            JOIN Suppliers s ON p.supplier_id = s.supplier_id            
+            WHERE p.product_name = %s            
+            """
+    cursor.execute(query, (product_name,))
+    product_details = cursor.fetchone()
+    db.close()
+    return product_details
 
 # Supplier Functions
 def add_supplier(supplier_name, supplier_contact):
