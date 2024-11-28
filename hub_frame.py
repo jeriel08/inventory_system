@@ -208,7 +208,7 @@ class AddFrame(CTkFrame):
                                   font=("Roboto", 14))
         category_label.place(x=338, y=140)
 
-        categories = ["Electronics", "Apparel", "Home Appliances", "Furniture", "Groceries", "Health & Beauty", "Books",
+        self.categories = ["Electronics", "Apparel", "Home Appliances", "Furniture", "Groceries", "Health & Beauty", "Books",
                       "Toy & Games", "Sports Equipment", "Office Supplies", "Pet Supplies"]
 
         self.category_entry = CTkComboBox(master=self,
@@ -219,7 +219,7 @@ class AddFrame(CTkFrame):
                                   button_color=config.secondary,
                                   button_hover_color=config.clicked_secondary,
                                   text_color=config.text,
-                                  values=categories,
+                                  values=self.categories,
                                   font=("Roboto", 18))
         self.category_entry.place(x=319, y=161)
 
@@ -286,6 +286,7 @@ class AddFrame(CTkFrame):
 
         price_float = float(price)
 
+        # Validate inputs
         if not all([product_name, quantity, price, category, supplier_name, supplier_contact]):
             messagebox.showerror("Input Error", "All fields must be filled.")
             return
@@ -294,8 +295,8 @@ class AddFrame(CTkFrame):
             messagebox.showerror("Input Error", "Quantity must be a positive integer.")
             return
 
-        if not price.isdigit():
-            messagebox.showerror("Input Error", "Price must be a positive integer.")
+        if not price.replace('.', '', 1).isdigit():  # Allow floats for price
+            messagebox.showerror("Input Error", "Price must be a positive number.")
             return
 
         if not (0 <= price_float <= 99999999.99):
@@ -306,29 +307,59 @@ class AddFrame(CTkFrame):
             messagebox.showerror("Input Error", "Supplier contact must contain numbers only.")
             return
 
+        # Check if the product already exists
         existing_product = database.get_product_by_name(product_name)
 
         if existing_product:
-            messagebox.showerror("Product Already Exist", "Product is already recorded. Update it instead.")
+            messagebox.showerror("Product Already Exists", "Product is already recorded. Update it instead.")
             return
 
-        existing_supplier = database.get_supplier_by_name_and_contact(supplier_name, supplier_contact)
+        # Check if the supplier already exists
+        existing_supplier = database.get_supplier_by_name(supplier_name)
 
         if existing_supplier:
-            supplier_id = existing_supplier['supplier_id']
+            response = messagebox.askyesno(
+                "Supplier Exists",
+                f"Supplier '{supplier_name}' already exists with contact number '{existing_supplier['contact_number']}'.\n"
+                "Do you want to use the existing supplier or update its details?"
+            )
+
+            if response:  # User chose 'Yes' to use the existing supplier
+                supplier_id = existing_supplier["supplier_id"]
+            else:  # User chose 'No' to update the supplier details
+                database.update_supplier(existing_supplier["supplier_id"], supplier_name, supplier_contact)
+                supplier_id = existing_supplier["supplier_id"]
         else:
+            # Add the supplier if not found
             supplier_id = database.add_supplier(supplier_name, supplier_contact)
             if not supplier_id:
                 messagebox.showerror("Error", "Failed to add supplier. Product not saved.")
                 return
 
         if supplier_id:
-            user_id = ActiveUser.user_id
+            user_id = ActiveUser.user_id  # Replace with the actual active user logic
 
-            database.add_product(product_name=product_name, category=category, price=int(price), quantity=int(quantity), supplier_id=supplier_id, user_id=user_id)
+            # Add the product
+            database.add_product(
+                product_name=product_name,
+                category=category,
+                price=float(price),
+                quantity=int(quantity),
+                supplier_id=supplier_id,
+                user_id=user_id,
+            )
             messagebox.showinfo("Success", "Product added successfully.")
+            self.clear_fields()
         else:
             messagebox.showerror("Error", "Failed to add supplier. Product not saved.")
+
+    def clear_fields(self):
+        self.product_name_entry.delete(0, END)
+        self.category_entry.set(self.categories[0])
+        self.quantity_entry.delete(0, END)
+        self.price_entry.delete(0, END)
+        self.supplier_name_entry.delete(0, END)
+        self.contact_entry.delete(0, END)
 
 class DeleteFrame(CTkFrame):
     def __init__(self, master):
@@ -525,6 +556,14 @@ class UpdateFrame(CTkFrame):
     def __init__(self, master):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
 
+        # Initialize Variables
+        self.product_name_var = StringVar()
+        self.category_var = StringVar()
+        self.quantity_var = StringVar()
+        self.price_var = StringVar()
+        self.supplier_name_var = StringVar()
+        self.contact_number_var = StringVar()
+
         # Product Section
         product_title_label = CTkLabel(master=self,
                                        text="PRODUCT DETAILS",
@@ -546,6 +585,8 @@ class UpdateFrame(CTkFrame):
                                                  border_color=config.secondary,
                                                  button_color=config.secondary,
                                                  button_hover_color=config.secondary,
+                                                 variable=self.product_name_var,
+                                                 command=self.load_product_details,
                                                  font=("Roboto", 18))
         self.product_name_combobox.place(x=24, y=161)
 
@@ -563,6 +604,7 @@ class UpdateFrame(CTkFrame):
                                     corner_radius=35,
                                     border_color=config.secondary,
                                     text_color=config.text,
+                                    textvariable=self.price_var,
                                     font=("Roboto", 18))
         self.price_entry.place(x=24, y=253)
 
@@ -580,6 +622,7 @@ class UpdateFrame(CTkFrame):
                                        corner_radius=35,
                                        border_color=config.secondary,
                                        text_color=config.text,
+                                       textvariable=self.quantity_var,
                                        font=("Roboto", 18))
         self.quantity_entry.place(x=319, y=253)
 
@@ -602,6 +645,7 @@ class UpdateFrame(CTkFrame):
                                           button_color=config.secondary,
                                           button_hover_color=config.clicked_secondary,
                                           text_color=config.text,
+                                          variable=self.category_var,
                                           values=categories,
                                           font=("Roboto", 18))
         self.category_entry.place(x=319, y=161)
@@ -626,6 +670,7 @@ class UpdateFrame(CTkFrame):
                                             corner_radius=35,
                                             border_color=config.secondary,
                                             text_color=config.text,
+                                            textvariable=self.supplier_name_var,
                                             font=("Roboto", 18))
         self.supplier_name_entry.place(x=24, y=410)
 
@@ -643,6 +688,7 @@ class UpdateFrame(CTkFrame):
                                       corner_radius=35,
                                       border_color=config.secondary,
                                       text_color=config.text,
+                                      textvariable=self.contact_number_var,
                                       font=("Roboto", 18))
         self.contact_entry.place(x=319, y=410)
 
@@ -655,8 +701,101 @@ class UpdateFrame(CTkFrame):
                                         border_color=config.accent,
                                         fg_color=config.secondary,
                                         hover_color=config.clicked_secondary,
-                                        font=("Roboto", 18))
+                                        font=("Roboto", 18),
+                                       command=self.update_product)
         self.update_button.place(x=220, y=525)
+
+        self.populate_product_combobox()
+
+    def populate_product_combobox(self):
+        products = database.fetch_product_name()
+        self.product_name_combobox.configure(values=products)
+
+    def load_product_details(self, product_name):
+        product_details = database.fetch_product_detail(product_name)
+        if product_details:
+            self.category_entry.set(product_details[0])
+            self.quantity_entry.insert(0, product_details[1])
+            self.price_entry.insert(0, product_details[2])
+            self.supplier_name_entry.insert(0, product_details[3])
+            self.contact_entry.insert(0, product_details[4])
+        else:
+            messagebox.showerror("Error", "Product details not found.")
+
+    def update_product(self):
+        product_name = self.product_name_combobox.get().strip()
+        quantity = self.quantity_entry.get().strip()
+        price = self.price_entry.get().strip()
+        category = self.category_entry.get().strip()
+        supplier_name = self.supplier_name_entry.get().strip()
+        supplier_contact = self.contact_entry.get().strip()
+
+        # Validate inputs
+        if not all([product_name, quantity, price, category, supplier_name, supplier_contact]):
+            messagebox.showerror("Input Error", "All fields must be filled.")
+            return
+
+        if not quantity.isdigit() or int(quantity) <= 0:
+            messagebox.showerror("Input Error", "Quantity must be a positive integer.")
+            return
+
+        if not price.replace('.', '', 1).isdigit():  # Allow floats for price
+            messagebox.showerror("Input Error", "Price must be a positive number.")
+            return
+
+        if not supplier_contact.isdigit() or len(supplier_contact) > 11:
+            messagebox.showerror("Input Error", "Supplier contact must contain numbers only.")
+            return
+
+        # Fetch the product's current details
+        existing_product = database.get_product_by_name(product_name)
+        if not existing_product:
+            messagebox.showerror("Error", "Product not found.")
+            return
+
+        # Check if the supplier already exists
+        existing_supplier = database.get_supplier_by_name(supplier_name)
+        if existing_supplier and existing_supplier["supplier_id"] != existing_product["supplier_id"]:
+            response = messagebox.askyesno(
+                "Supplier Change",
+                f"The supplier '{supplier_name}' differs from the current supplier.\n"
+                "Do you want to update the supplier or associate this product with the existing supplier?"
+            )
+
+            if response:
+                supplier_id = existing_supplier["supplier_id"]
+            else:
+                database.update_supplier(existing_product["supplier_id"], supplier_name, supplier_contact)
+                supplier_id = existing_product["supplier_id"]
+        elif not existing_supplier:
+            supplier_id = database.add_supplier(supplier_name, supplier_contact)
+        else:
+            supplier_id = existing_product["supplier_id"]
+
+        # Update the product in the database
+        product_id = existing_product["product_id"]
+        updated = database.update_product(
+            product_id=product_id,
+            product_name=product_name,
+            category=category,
+            price=float(price),
+            quantity=int(quantity),
+            supplier_id=supplier_id,
+        )
+
+        if updated:
+            messagebox.showinfo("Success", "Product updated successfully.")
+            self.clear_fields()
+        else:
+            messagebox.showerror("Error", "Failed to update product.")
+
+    def clear_fields(self):
+        self.product_name_var.set("")
+        self.category_var.set("")
+        self.quantity_var.set("")
+        self.price_var.set("")
+        self.supplier_name_var.set("")
+        self.contact_number_var.set("")
 
 class ClearFrame(CTkFrame):
     def __init__(self, master):

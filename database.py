@@ -67,17 +67,24 @@ def add_product(product_name, price, quantity, category, supplier_id, user_id):
     connection = connect_db()
     cursor = connection.cursor()
     query = "INSERT INTO products (product_name, price, quantity, category, supplier_id, user_id, created_at) VALUES (%s, %s, %s, %s, %s, %s, NOW())"
-    cursor.execute(query, (product_name, int(quantity), float(price), category, supplier_id, user_id))
+    cursor.execute(query, (product_name, float(price), int(quantity), category, supplier_id, user_id))
     connection.commit()
     close_connection(connection)
 
-def update_product(product_id, updated_data):
+def update_product(product_id, product_name, category, price, quantity, supplier_id):
     connection = connect_db()
     cursor = connection.cursor()
-    query = "UPDATE products SET product_name = %s, description = %s, price = %s, quantity = %s, supplier_id = %s WHERE product_id = %s"
-    cursor.execute(query, (*updated_data, product_id))
+    query = """
+        UPDATE products
+        SET product_name = %s, category = %s, price = %s, quantity = %s, supplier_id = %s, updated_at = NOW()
+        WHERE product_id = %s
+    """
+    cursor.execute(query, (product_name, category, price, quantity, supplier_id, product_id))
     connection.commit()
+    rows_affected = cursor.rowcount
     close_connection(connection)
+    return rows_affected > 0
+
 
 def delete_product(product_name):
     connection = connect_db()
@@ -128,13 +135,14 @@ def add_supplier(supplier_name, supplier_contact):
     close_connection(connection)
     return supplier_id
 
-def update_supplier(supplier_id, updated_data):
+def update_supplier(supplier_id, supplier_name, contact_number):
     connection = connect_db()
     cursor = connection.cursor()
     query = "UPDATE suppliers SET supplier_name = %s, contact_number = %s WHERE supplier_id = %s"
-    cursor.execute(query, (*updated_data, supplier_id))
+    cursor.execute(query, (supplier_name, contact_number, supplier_id))
     connection.commit()
     close_connection(connection)
+
 
 def delete_supplier(supplier_id):
     connection = connect_db()
@@ -143,11 +151,11 @@ def delete_supplier(supplier_id):
     connection.commit()
     close_connection(connection)
 
-def get_supplier_by_name_and_contact(supplier_name, contact_number):
+def get_supplier_by_name(supplier_name):
     connection = connect_db()
     cursor = connection.cursor(dictionary=True)
-    query = "SELECT * FROM suppliers WHERE supplier_name = %s AND contact_number = %s"
-    cursor.execute(query, (supplier_name, contact_number))
+    query = "SELECT supplier_id, supplier_name, contact_number FROM suppliers WHERE supplier_name = %s"
+    cursor.execute(query, (supplier_name,))
     result = cursor.fetchone()
     close_connection(connection)
     return result
