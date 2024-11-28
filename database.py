@@ -166,22 +166,29 @@ def get_supplier_by_name(supplier_name):
 
 
 # General Utility
-def fetch_treeview_data():
+def fetch_inventory_data():
     connection = connect_db()
-    cursor = connection.cursor(dictionary=True)
-
+    cursor = connection.cursor()
     query = """
-    SELECT p.product_id, p.product_name, p.quantity, p.price, p.supplier_id, 
-           s.supplier_name, s.contact_info, p.created_at
-    FROM products p
-    JOIN suppliers s ON p.supplier_id = s.supplier_id;
+        SELECT
+            p.product_id,
+            p.product_name,
+            p.price,
+            p.quantity,
+            p.category,
+            p.created_at,
+            s.supplier_id,
+            s.supplier_name,
+            s.contact_number
+        FROM
+            products p
+        LEFT JOIN
+            suppliers s ON p.supplier_id = s.supplier_id
+        ORDER BY p.product_id
     """
-
     cursor.execute(query)
     data = cursor.fetchall()
-
     close_connection(connection)
-
     return data
 
 # Clear Operation

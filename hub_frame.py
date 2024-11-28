@@ -1,5 +1,4 @@
 from tkinter import messagebox
-
 from customtkinter import *
 import config
 import database
@@ -7,9 +6,10 @@ from session import ActiveUser
 
 
 class OuterFrame(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, inventory_frame):
         super().__init__(master=master, width=865, height=674, fg_color="transparent")
         self.frames = {}
+        self.inventory_frame = inventory_frame
 
         hub_title_label = CTkLabel(master=self,
                  text="HUB",
@@ -107,7 +107,7 @@ class OuterFrame(CTkFrame):
         self.hide_all_frames()
         self.sub_frame_title.configure(text="-ADD-")
         if 'add_frame' not in self.frames:
-            add_frame = AddFrame(self, self)
+            add_frame = AddFrame(self, self, self.inventory_frame)
             self.frames['add_frame'] = add_frame
         self.frames['add_frame'].place(x=247, y=0)
 
@@ -115,7 +115,7 @@ class OuterFrame(CTkFrame):
         self.hide_all_frames()
         self.sub_frame_title.configure(text="-DELETE-")
         if 'delete_frame' not in self.frames:
-            delete_frame = DeleteFrame(self, self)
+            delete_frame = DeleteFrame(self, self, self.inventory_frame)
             self.frames['delete_frame'] = delete_frame
         self.frames['delete_frame'].place(x=247, y=0)
 
@@ -123,7 +123,7 @@ class OuterFrame(CTkFrame):
         self.hide_all_frames()
         self.sub_frame_title.configure(text="-UPDATE-")
         if 'update_frame' not in self.frames:
-            update_frame = UpdateFrame(self)
+            update_frame = UpdateFrame(self, self.inventory_frame)
             self.frames['update_frame'] = update_frame
         self.frames['update_frame'].place(x=247, y=0)
 
@@ -131,7 +131,7 @@ class OuterFrame(CTkFrame):
         self.hide_all_frames()
         self.sub_frame_title.configure(text="-CLEAR-")
         if 'clear_frame' not in self.frames:
-            clear_frame = ClearFrame(self, self)
+            clear_frame = ClearFrame(self, self, self.inventory_frame)
             self.frames['clear_frame'] = clear_frame
         self.frames['clear_frame'].place(x=247, y=0)
 
@@ -146,10 +146,11 @@ class OuterFrame(CTkFrame):
             self.frames['delete_frame'].refresh_product_list()
 
 class AddFrame(CTkFrame):
-    def __init__(self, master, outer_frame):
+    def __init__(self, master, outer_frame, inventory_frame):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
 
         self.outer_frame = outer_frame
+        self.inventory_frame = inventory_frame
 
         # Product Section
         product_title_label = CTkLabel(master=self,
@@ -359,6 +360,7 @@ class AddFrame(CTkFrame):
             messagebox.showinfo("Success", "Product added successfully.")
             self.clear_fields()
             self.outer_frame.refresh_hub_frames()
+            self.inventory_frame.refresh_treeview()
         else:
             messagebox.showerror("Error", "Failed to add supplier. Product not saved.")
 
@@ -371,10 +373,11 @@ class AddFrame(CTkFrame):
         self.contact_entry.delete(0, END)
 
 class DeleteFrame(CTkFrame):
-    def __init__(self, master, outer_frame):
+    def __init__(self, master, outer_frame, inventory_frame):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
 
         self.outer_frame = outer_frame
+        self.inventory_frame = inventory_frame
 
         # Initialize Variables
         self.product_name_var = StringVar()
@@ -573,6 +576,7 @@ class DeleteFrame(CTkFrame):
 
                 self.clear_fields()
                 self.refresh_product_list()
+                self.inventory_frame.refresh_treeview()
 
                 update_frame = self.outer_frame.frames.get('update_frame')
                 if update_frame:
@@ -603,8 +607,10 @@ class DeleteFrame(CTkFrame):
             self.product_name_combobox.set("No products available.")
 
 class UpdateFrame(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, inventory_frame):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
+
+        self.inventory_frame = inventory_frame
 
         # Initialize Variables
         self.product_name_var = StringVar()
@@ -842,6 +848,7 @@ class UpdateFrame(CTkFrame):
         if updated:
             messagebox.showinfo("Success", "Product updated successfully.")
             self.clear_fields()
+            self.inventory_frame.refresh_treeview()
         else:
             messagebox.showerror("Error", "Failed to update product.")
 
@@ -864,10 +871,11 @@ class UpdateFrame(CTkFrame):
             self.product_name_combobox.set("No products available.")
 
 class ClearFrame(CTkFrame):
-    def __init__(self, master, outer_frame):
+    def __init__(self, master, outer_frame, inventory_frame):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
 
         self.outer_frame = outer_frame
+        self.inventory_frame = inventory_frame
 
         title_label = CTkLabel(master=self,
                                text="CLEAR INVENTORY",
@@ -922,6 +930,6 @@ class ClearFrame(CTkFrame):
                     self.outer_frame.frames['update_frame'].refresh_product_list()
                 if 'delete_frame' in self.outer_frame.frames:
                     self.outer_frame.frames['delete_frame'].refresh_product_list()
+                self.inventory_frame.refresh_treeview()
             else:
                 messagebox.showerror("Error", "Failed to clear the inventory.")
-

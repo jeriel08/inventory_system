@@ -106,7 +106,8 @@ class Dashboard(CTkToplevel):
         if 'inventory_panel' not in self.frames:
             inventory_panel = inventory_frame.InventoryFrame(self)
             self.frames['inventory_panel'] = inventory_panel
-        self.frames['inventory_panel'].place(x=355,y=23)
+        self.frames['inventory_panel'].refresh_treeview()
+        self.frames['inventory_panel'].place(x=355, y=23)
 
     def show_timeline(self):
         self.hide_all_frames()
@@ -118,7 +119,7 @@ class Dashboard(CTkToplevel):
     def show_hub(self):
         self.hide_all_frames()
         if 'hub_panel' not in self.frames:
-            hub_panel = hub_frame.OuterFrame(self)
+            hub_panel = hub_frame.OuterFrame(self, self.frames['inventory_panel'])
             self.frames['hub_panel'] = hub_panel
         self.frames['hub_panel'].place(x=355,y=25)
 
