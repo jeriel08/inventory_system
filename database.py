@@ -180,3 +180,28 @@ def fetch_treeview_data():
 
     return data
 
+# Clear Operation
+def clear_inventory(include_suppliers=False):
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("DELETE FROM products;")
+        cursor.execute("ALTER TABLE products AUTO_INCREMENT = 2000;")
+
+        if include_suppliers:
+            cursor.execute("DELETE FROM suppliers WHERE supplier_id NOT IN (SELECT supplier_id FROM products);")
+            cursor.execute("ALTER TABLE products AUTO_INCREMENT = 3000;")
+
+        connection.commit()
+        success = True
+    except Exception as e:
+        connection.rollback()
+        print(f"Error clearing inventory: {e}")
+        success = False
+    finally:
+        close_connection(connection)
+
+    return success
+
+

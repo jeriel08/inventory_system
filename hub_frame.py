@@ -831,5 +831,25 @@ class ClearFrame(CTkFrame):
                                        fg_color=config.exit_color,
                                        text_color=config.background,
                                        hover_color=config.exit_color_hover,
-                                       font=("Roboto", 18))
+                                       font=("Roboto", 18),
+                                       command=self.clear_inventory)
         self.delete_button.place(x=220, y=479)
+
+    @staticmethod
+    def clear_inventory():
+        include_suppliers = messagebox.askyesno(
+            "Clear Suppliers?",
+            "Do you also want to clear all suppliers that are not associated with any products?"
+        )
+
+        confirmation = messagebox.askyesno(
+            "Confirm Reset",
+            "Are you sure you want to clear the entire inventory? This action cannot be undone."
+        )
+
+        if confirmation:
+            success = database.clear_inventory(include_suppliers)
+            if success:
+                messagebox.showinfo("Success", "The inventory has been cleared.")
+            else:
+                messagebox.showerror("Error", "Failed to clear the inventory.")
