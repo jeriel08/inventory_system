@@ -85,13 +85,15 @@ def update_product(product_id, product_name, category, price, quantity, supplier
     close_connection(connection)
     return rows_affected > 0
 
-
 def delete_product(product_name):
     connection = connect_db()
     cursor = connection.cursor()
     cursor.execute("DELETE FROM products WHERE product_name = %s", (product_name,))
+    rows_affected = cursor.rowcount
     connection.commit()
     close_connection(connection)
+    return rows_affected > 0
+
 
 def get_product_by_name(product_name):
     connection = connect_db()
@@ -103,12 +105,14 @@ def get_product_by_name(product_name):
     return result
 
 def fetch_product_name():
-    db = connect_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT product_name FROM Products")
-    products = cursor.fetchall()
-    db.close()
-    return [product[0] for product in products]
+    connection = connect_db()
+    cursor = connection.cursor()
+    query = "SELECT product_name FROM products ORDER BY product_name"
+    cursor.execute(query)
+    product_names = [row[0] for row in cursor.fetchall()]  # Returns an empty list if no products exist
+    close_connection(connection)
+    return product_names
+
 
 def fetch_product_detail(product_name):
     db = connect_db()

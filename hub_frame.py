@@ -107,7 +107,7 @@ class OuterFrame(CTkFrame):
         self.hide_all_frames()
         self.sub_frame_title.configure(text="-ADD-")
         if 'add_frame' not in self.frames:
-            add_frame = AddFrame(self)
+            add_frame = AddFrame(self, self)
             self.frames['add_frame'] = add_frame
         self.frames['add_frame'].place(x=247, y=0)
 
@@ -115,7 +115,7 @@ class OuterFrame(CTkFrame):
         self.hide_all_frames()
         self.sub_frame_title.configure(text="-DELETE-")
         if 'delete_frame' not in self.frames:
-            delete_frame = DeleteFrame(self)
+            delete_frame = DeleteFrame(self, self)
             self.frames['delete_frame'] = delete_frame
         self.frames['delete_frame'].place(x=247, y=0)
 
@@ -131,7 +131,7 @@ class OuterFrame(CTkFrame):
         self.hide_all_frames()
         self.sub_frame_title.configure(text="-CLEAR-")
         if 'clear_frame' not in self.frames:
-            clear_frame = ClearFrame(self)
+            clear_frame = ClearFrame(self, self)
             self.frames['clear_frame'] = clear_frame
         self.frames['clear_frame'].place(x=247, y=0)
 
@@ -139,9 +139,17 @@ class OuterFrame(CTkFrame):
         for frame in self.frames.values():
             frame.place_forget()
 
+    def refresh_hub_frames(self):
+        if 'update_frame' in self.frames:
+            self.frames['update_frame'].refresh_product_list()
+        if 'delete_frame' in self.frames:
+            self.frames['delete_frame'].refresh_product_list()
+
 class AddFrame(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, outer_frame):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
+
+        self.outer_frame = outer_frame
 
         # Product Section
         product_title_label = CTkLabel(master=self,
@@ -350,6 +358,7 @@ class AddFrame(CTkFrame):
             )
             messagebox.showinfo("Success", "Product added successfully.")
             self.clear_fields()
+            self.outer_frame.refresh_hub_frames()
         else:
             messagebox.showerror("Error", "Failed to add supplier. Product not saved.")
 
@@ -362,8 +371,10 @@ class AddFrame(CTkFrame):
         self.contact_entry.delete(0, END)
 
 class DeleteFrame(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, outer_frame):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
+
+        self.outer_frame = outer_frame
 
         # Initialize Variables
         self.product_name_var = StringVar()
@@ -522,6 +533,12 @@ class DeleteFrame(CTkFrame):
         self.product_name_combobox.configure(values=products)
 
     def load_product_details(self, product_name):
+        # Clear all entries before adding details
+        self.quantity_entry.delete(0, END)
+        self.price_entry.delete(0, END)
+        self.supplier_name_entry.delete(0, END)
+        self.contact_entry.delete(0, END)
+
         product_details = database.fetch_product_detail(product_name)
         if product_details:
             self.category_entry.set(product_details[0])
@@ -533,16 +550,40 @@ class DeleteFrame(CTkFrame):
             messagebox.showerror("Error", "Product details not found.")
 
     def delete_product(self):
-        product_name = self.product_name_var.get()
+        # Fetch selected product name
+        product_name = self.product_name_combobox.get().strip()
 
         if not product_name:
             messagebox.showerror("Error", "Please select a product to delete.")
             return
 
-        database.delete_product(product_name)
-        messagebox.showinfo("Success", f"Product '{product_name}' deleted successfully!")
-        self.populate_product_combobox()
-        self.clear_fields()
+        # Confirm deletion
+        confirmation = messagebox.askyesno(
+            "Confirm Deletion",
+            f"Are you sure you want to delete '{product_name}'?"
+        )
+
+        if not confirmation:
+            return
+
+        try:
+            success = database.delete_product(product_name)
+            if success:
+                messagebox.showinfo("Success", f"Product '{product_name}' deleted successfully.")
+
+                self.clear_fields()
+                self.refresh_product_list()
+
+                update_frame = self.outer_frame.frames.get('update_frame')
+                if update_frame:
+                    update_frame.refresh_product_list()
+            else:
+                messagebox.showerror(
+                    "Error",
+                    f"Failed to delete '{product_name}'. It may not exist or was already removed."
+                )
+        except Exception as e:
+            messagebox.showerror("Error", f"An unexpected error occurred: {e}")
 
     def clear_fields(self):
         self.product_name_var.set("")
@@ -551,6 +592,15 @@ class DeleteFrame(CTkFrame):
         self.price_var.set("")
         self.supplier_name_var.set("")
         self.contact_number_var.set("")
+
+    def refresh_product_list(self):
+        product_names = database.fetch_product_name()
+        self.product_name_combobox.configure(values=product_names)
+
+        if product_names:
+            self.product_name_combobox.set("")
+        else:
+            self.product_name_combobox.set("No products available.")
 
 class UpdateFrame(CTkFrame):
     def __init__(self, master):
@@ -712,6 +762,12 @@ class UpdateFrame(CTkFrame):
         self.product_name_combobox.configure(values=products)
 
     def load_product_details(self, product_name):
+        # Clear all entries before adding details
+        self.quantity_entry.delete(0, END)
+        self.price_entry.delete(0, END)
+        self.supplier_name_entry.delete(0, END)
+        self.contact_entry.delete(0, END)
+
         product_details = database.fetch_product_detail(product_name)
         if product_details:
             self.category_entry.set(product_details[0])
@@ -797,9 +853,21 @@ class UpdateFrame(CTkFrame):
         self.supplier_name_var.set("")
         self.contact_number_var.set("")
 
+    def refresh_product_list(self):
+        product_names = database.fetch_product_name()
+        self.product_name_combobox.configure(values=product_names)
+
+        if product_names:
+            self.product_name_combobox.set("")
+            self.clear_fields()
+        else:
+            self.product_name_combobox.set("No products available.")
+
 class ClearFrame(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, outer_frame):
         super().__init__(master=master, width=618, height=674, fg_color="transparent")
+
+        self.outer_frame = outer_frame
 
         title_label = CTkLabel(master=self,
                                text="CLEAR INVENTORY",
@@ -835,8 +903,7 @@ class ClearFrame(CTkFrame):
                                        command=self.clear_inventory)
         self.delete_button.place(x=220, y=479)
 
-    @staticmethod
-    def clear_inventory():
+    def clear_inventory(self):
         include_suppliers = messagebox.askyesno(
             "Clear Suppliers?",
             "Do you also want to clear all suppliers that are not associated with any products?"
@@ -851,5 +918,10 @@ class ClearFrame(CTkFrame):
             success = database.clear_inventory(include_suppliers)
             if success:
                 messagebox.showinfo("Success", "The inventory has been cleared.")
+                if 'update_frame' in self.outer_frame.frames:
+                    self.outer_frame.frames['update_frame'].refresh_product_list()
+                if 'delete_frame' in self.outer_frame.frames:
+                    self.outer_frame.frames['delete_frame'].refresh_product_list()
             else:
                 messagebox.showerror("Error", "Failed to clear the inventory.")
+
