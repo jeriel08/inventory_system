@@ -1,5 +1,5 @@
 from tkinter import messagebox
-
+from datetime import datetime
 from customtkinter import *
 import config
 from tkcalendar import Calendar
@@ -203,13 +203,18 @@ class Account(CTkFrame):
         submit.place(x=152, y=288)
 
     def grab_date(self):
-        # Get the selected date and update the birthday entry
         selected_date = self.cal.get_date()
-        self.birthday.delete(0, END)
-        self.birthday.insert(0, selected_date)
 
-        # Close the calendar window
-        self.date_window.destroy()
+        try:
+            formatted_date = datetime.strptime(selected_date, "%m/%d/%y").strftime("%Y-%m-%d")
+
+            self.birthday.delete(0, END)
+            self.birthday.insert(0, formatted_date)
+
+            self.date_window.destroy()
+
+        except ValueError:
+            messagebox.showerror("Date Error", "An error occurred while processing the selected date.")
 
     def save_func(self):
         # Get updated user input

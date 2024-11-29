@@ -15,6 +15,9 @@ class Dashboard(CTkToplevel):
         self.resizable(False, False)
         self.frames = {}
 
+        inventory_panel = inventory_frame.InventoryFrame(self)
+        self.frames['inventory_panel'] = inventory_panel
+
         config.window_size(master=self, window_width=config.d_width, window_height=config.d_height)
 
         # Posting Logo

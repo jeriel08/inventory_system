@@ -35,7 +35,7 @@ def update_user(user_id, username, password, contact_number, email, birthdate, g
         cursor = connection.cursor()
         query = """
             UPDATE users
-            SET username = %s, password = %s, contact_number = %s, email = %s, birthdate = %s, gender = %s
+            SET username = %s, password = %s, contact_number = %s, email = %s, birthdate = %s, gender = %s, updated_at = NOW()
             WHERE user_id = %s
         """
         cursor.execute(query, (username, password, contact_number, email, birthdate, gender, user_id))
