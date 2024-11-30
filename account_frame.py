@@ -1,6 +1,11 @@
+from tkinter import messagebox
+from datetime import datetime
 from customtkinter import *
 import config
 from tkcalendar import Calendar
+
+from session import ActiveUser
+
 
 class Account(CTkFrame):
     def __init__(self, master):
@@ -161,6 +166,8 @@ class Account(CTkFrame):
                                         command=self.save_func)
         self.save_button.place(x=345, y=523)
 
+        self.load_account_details()
+
     def show_password(self):
         if self.show_password_status.get():
             self.password.configure(show="")
@@ -196,18 +203,78 @@ class Account(CTkFrame):
         submit.place(x=152, y=288)
 
     def grab_date(self):
-        # Get the selected date and update the birthday entry
         selected_date = self.cal.get_date()
-        self.birthday.delete(0, END)
-        self.birthday.insert(0, selected_date)
 
-        # Close the calendar window
-        self.date_window.destroy()
+        try:
+            formatted_date = datetime.strptime(selected_date, "%m/%d/%y").strftime("%Y-%m-%d")
+
+            self.birthday.delete(0, END)
+            self.birthday.insert(0, formatted_date)
+
+            self.date_window.destroy()
+
+        except ValueError:
+            messagebox.showerror("Date Error", "An error occurred while processing the selected date.")
 
     def save_func(self):
-        self.username.delete(0, END)
-        self.password.delete(0, END)
-        self.contact_number.delete(0, END)
-        self.email_address.delete(0, END)
-        self.birthday.delete(0, END)
-        self.gender.set("Male")
+        # Get updated user input
+        new_username = self.username.get().strip()
+        new_password = self.password.get().strip()
+        new_contact_number = self.contact_number.get().strip()
+        new_email = self.email_address.get().strip()
+        new_birthdate = self.birthday.get().strip()
+        new_gender = self.gender.get().strip()
+
+        # Validation
+        if not new_username or not new_password or not new_contact_number or not new_email or not new_birthdate or not new_gender:
+            messagebox.showerror("Input Error", "All fields are required.")
+            return
+
+        if len(new_password) < 8:
+            messagebox.showerror("Invalid Password", "Password must be at least 8 characters long.")
+            return
+
+        if not new_contact_number.isdigit() or not new_contact_number.startswith("09") or len(new_contact_number) != 11:
+            messagebox.showerror("Invalid Contact Number",
+                                 "Contact Number must be exactly 11 digits long and start with '09'.")
+            return
+
+        if '@' not in new_email or '.' not in new_email.split('@')[-1]:
+            messagebox.showerror("Invalid Email", "Please enter a valid email address.")
+            return
+
+        # Update the database
+        from database import update_user
+        success = update_user(
+            user_id=ActiveUser.user_id,
+            username=new_username,
+            password=new_password,
+            contact_number=new_contact_number,
+            email=new_email,
+            birthdate=new_birthdate,
+            gender=new_gender
+        )
+
+        # Feedback to the user
+        if success:
+            messagebox.showinfo("Success", "Account details updated successfully.")
+            # Update the ActiveUser session
+            ActiveUser.set_user(
+                user_id=ActiveUser.user_id,
+                username=new_username,
+                password=new_password,
+                contact_number=new_contact_number,
+                email=new_email,
+                birthdate=new_birthdate,
+                gender=new_gender
+            )
+        else:
+            messagebox.showerror("Update Failed", "Unable to update account details. Please try again later.")
+
+    def load_account_details(self):
+        self.username.insert(0, ActiveUser.username)
+        self.password.insert(0, ActiveUser.password)
+        self.contact_number.insert(0, ActiveUser.contact_number)
+        self.email_address.insert(0, ActiveUser.email)
+        self.birthday.insert(0, ActiveUser.birthdate)
+        self.gender.set(ActiveUser.gender)

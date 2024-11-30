@@ -15,6 +15,9 @@ class Dashboard(CTkToplevel):
         self.resizable(False, False)
         self.frames = {}
 
+        inventory_panel = inventory_frame.InventoryFrame(self)
+        self.frames['inventory_panel'] = inventory_panel
+
         config.window_size(master=self, window_width=config.d_width, window_height=config.d_height)
 
         # Posting Logo
@@ -40,7 +43,7 @@ class Dashboard(CTkToplevel):
         timeline_ctk = CTkImage(light_image=config.timeline_icon, dark_image=config.timeline_icon, size=(30, 30))
 
         timeline = CTkButton(master=self,
-                           text="Timeline",
+                           text="Chart",
                            font=("Roboto", 24),
                            fg_color="transparent",
                            text_color=config.text,
@@ -106,19 +109,21 @@ class Dashboard(CTkToplevel):
         if 'inventory_panel' not in self.frames:
             inventory_panel = inventory_frame.InventoryFrame(self)
             self.frames['inventory_panel'] = inventory_panel
-        self.frames['inventory_panel'].place(x=355,y=23)
+        self.frames['inventory_panel'].refresh_treeview()
+        self.frames['inventory_panel'].place(x=355, y=23)
 
     def show_timeline(self):
         self.hide_all_frames()
         if 'timeline_panel' not in self.frames:
             timeline_panel = timeline_frame.TimelineFrame(self)
             self.frames['timeline_panel'] = timeline_panel
+        self.frames['timeline_panel'].refresh_bar_graph()
         self.frames['timeline_panel'].place(x=355,y=23)
 
     def show_hub(self):
         self.hide_all_frames()
         if 'hub_panel' not in self.frames:
-            hub_panel = hub_frame.OuterFrame(self)
+            hub_panel = hub_frame.OuterFrame(self, self.frames['inventory_panel'])
             self.frames['hub_panel'] = hub_panel
         self.frames['hub_panel'].place(x=355,y=25)
 
