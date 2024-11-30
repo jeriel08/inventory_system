@@ -2,6 +2,7 @@ from customtkinter import *
 import customtkinter
 import config
 import inventory_frame, account_frame, hub_frame, timeline_frame
+from tkinter import messagebox
 
 customtkinter.set_appearance_mode("light")
 
@@ -11,7 +12,7 @@ class Dashboard(CTkToplevel):
         self.controller = controller
         self.title("SmartStock Tracker - Main App")
         self.configure(bg=config.background)
-        self.protocol("WM_DELETE_WINDOW", self.controller.show_login_page)
+        self.protocol("WM_DELETE_WINDOW", self.logout_button)
         self.resizable(False, False)
         self.frames = {}
 
@@ -139,5 +140,7 @@ class Dashboard(CTkToplevel):
             frame.place_forget()
 
     def logout_button(self):
-        self.withdraw()
-        self.controller.show_login_page()
+        confirm = messagebox.askyesno("Logout Confirmation", "Are you sure you want to logout?")
+        if confirm:
+            self.withdraw()
+            self.controller.show_login_page()
