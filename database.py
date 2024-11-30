@@ -94,7 +94,6 @@ def delete_product(product_name):
     close_connection(connection)
     return rows_affected > 0
 
-
 def get_product_by_name(product_name):
     connection = connect_db()
     cursor = connection.cursor(dictionary=True)

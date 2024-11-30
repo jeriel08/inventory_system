@@ -43,7 +43,7 @@ class Dashboard(CTkToplevel):
         timeline_ctk = CTkImage(light_image=config.timeline_icon, dark_image=config.timeline_icon, size=(30, 30))
 
         timeline = CTkButton(master=self,
-                           text="Timeline",
+                           text="Chart",
                            font=("Roboto", 24),
                            fg_color="transparent",
                            text_color=config.text,
@@ -117,6 +117,7 @@ class Dashboard(CTkToplevel):
         if 'timeline_panel' not in self.frames:
             timeline_panel = timeline_frame.TimelineFrame(self)
             self.frames['timeline_panel'] = timeline_panel
+        self.frames['timeline_panel'].refresh_bar_graph()
         self.frames['timeline_panel'].place(x=355,y=23)
 
     def show_hub(self):

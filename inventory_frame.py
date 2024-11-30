@@ -52,14 +52,14 @@ class InventoryFrame(CTkFrame):
 
         # Format Columns
         self.product_table.column("Product ID", anchor=CENTER, width=180)
-        self.product_table.column("Product Name", anchor=W, width=250)
+        self.product_table.column("Product Name", anchor=CENTER, width=250)
         self.product_table.column("Price", anchor=CENTER, width=250)
         self.product_table.column("Quantity", anchor=CENTER, width=250)
-        self.product_table.column("Category", anchor=W, width=250)
-        self.product_table.column("Date", anchor=W, width=250)
-        self.product_table.column("Supplier ID", anchor=W, width=180)
-        self.product_table.column("Supplier Name", anchor=W, width=250)
-        self.product_table.column("Contact Number", anchor=W, width=250)
+        self.product_table.column("Category", anchor=CENTER, width=250)
+        self.product_table.column("Date", anchor=CENTER, width=250)
+        self.product_table.column("Supplier ID", anchor=CENTER, width=180)
+        self.product_table.column("Supplier Name", anchor=CENTER, width=250)
+        self.product_table.column("Contact Number", anchor=CENTER, width=250)
 
         # Define the Headings
         for column in columns:
